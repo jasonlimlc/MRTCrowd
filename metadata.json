@@ -1,0 +1,6 @@
+{
+  "name": "CommuteWise SG MRT",
+  "description": "Singapore real-time crowd intelligence, MRT line density monitor, and departure forecasts powered by LTA Open Data and verified commuters.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
