@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, ThumbsUp, Bell, MapPin, Sparkles, RefreshCw } from 'lucide-react';
 import { StationData } from '../types/transit';
+import { calculateLiveDeparture, LiveDepartureInfo } from '../utils/transitTime';
 
 interface HeroProps {
   currentStation: StationData;
@@ -22,28 +23,33 @@ export const Hero: React.FC<HeroProps> = ({
   const [selectedCar, setSelectedCar] = useState<number | null>(null);
   const [upvotes, setUpvotes] = useState(currentStation.recentReport.upvotes);
   const [hasUpvoted, setHasUpvoted] = useState(false);
-  const [sgtTime, setSgtTime] = useState('');
   const [isScanning, setIsScanning] = useState(false);
+  const [liveInfo, setLiveInfo] = useState<LiveDepartureInfo>(() =>
+    calculateLiveDeparture(
+      currentStation.id,
+      currentStation.crowdLevel,
+      currentStation.minutesSaved
+    )
+  );
 
-  // Update real-time Singapore Time
+  // Update real-time Singapore Time and live departure calculations continuously every second
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      // Format to SGT HH:mm:ss
-      const formatted = now.toLocaleTimeString('en-SG', {
-        timeZone: 'Asia/Singapore',
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      });
-      setSgtTime(`${formatted} SGT`);
+      setLiveInfo(
+        calculateLiveDeparture(
+          currentStation.id,
+          currentStation.crowdLevel,
+          currentStation.minutesSaved,
+          now
+        )
+      );
     };
 
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [currentStation.id, currentStation.crowdLevel, currentStation.minutesSaved]);
 
   // Sync upvotes when station changes
   useEffect(() => {
@@ -166,9 +172,9 @@ export const Hero: React.FC<HeroProps> = ({
                   </span>
                 </div>
                 <div className="flex items-center space-x-1.5">
-                  <span className="text-[11px] font-mono-numbers text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700 flex items-center">
+                  <span className="text-[11px] font-mono-numbers text-slate-300 bg-slate-800 px-2 py-0.5 rounded border border-slate-700 flex items-center shadow-inner">
                     <Clock className="w-3 h-3 mr-1 text-sky-400" />
-                    {sgtTime || '18:14 SGT'}
+                    {liveInfo.sgtTime}
                   </span>
                 </div>
               </div>
@@ -183,19 +189,17 @@ export const Hero: React.FC<HeroProps> = ({
                     </span>
                   </div>
                   <span className="text-xs font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/50 font-mono-numbers">
-                    {currentStation.recommendedWaitMins === 0
-                      ? 'Board Now'
-                      : `${currentStation.recommendedWaitMins} Min Wait`}
+                    {liveInfo.waitBadgeText}
                   </span>
                 </div>
                 <p className="text-lg font-bold text-white mt-1.5">
                   Leave at{' '}
                   <span className="text-sky-400 font-mono-numbers">
-                    {currentStation.recommendedDeparture}
+                    {liveInfo.departureTime}
                   </span>{' '}
-                  to save {currentStation.minutesSaved} mins
+                  to save {liveInfo.minutesSaved} mins
                 </p>
-                <p className="text-xs text-slate-400 mt-1">{currentStation.advice}</p>
+                <p className="text-xs text-slate-400 mt-1">{liveInfo.advice}</p>
               </div>
 
               {/* Platform Density Status */}

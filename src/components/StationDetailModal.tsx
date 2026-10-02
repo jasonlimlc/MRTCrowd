@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Clock, ArrowRight, ShieldCheck, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { StationData } from '../types/transit';
+import { calculateLiveDeparture } from '../utils/transitTime';
 
 interface StationDetailModalProps {
   station: StationData | null;
@@ -13,6 +14,12 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
   onClose,
 }) => {
   if (!station) return null;
+
+  const liveInfo = calculateLiveDeparture(
+    station.id,
+    station.crowdLevel,
+    station.minutesSaved
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
@@ -58,9 +65,9 @@ export const StationDetailModal: React.FC<StationDetailModalProps> = ({
                 Optimized Departure Advice
               </span>
               <p className="text-white font-bold text-base mt-0.5">
-                Leave at {station.recommendedDeparture} (Save {station.minutesSaved} mins)
+                Leave at {liveInfo.departureTime} (Save {liveInfo.minutesSaved} mins)
               </p>
-              <p className="text-xs text-slate-300 mt-1">{station.advice}</p>
+              <p className="text-xs text-slate-300 mt-1">{liveInfo.advice}</p>
             </div>
             <div className="text-right sm:border-l sm:border-slate-800 sm:pl-4 shrink-0">
               <span className="text-xs text-slate-400 block">Current Density</span>
