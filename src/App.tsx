@@ -22,6 +22,7 @@ import { WeeklyDigestModal } from './components/WeeklyDigestModal';
 import { StoreModal } from './components/StoreModal';
 import { TelegramModal } from './components/TelegramModal';
 import { FeedbackModal } from './components/FeedbackModal';
+import { HealthMonitorModal } from './components/HealthMonitorModal';
 import { ToastContainer, ToastMessage } from './components/Toast';
 
 import { MRT_LINES, STATIONS_DATABASE, INITIAL_TELEGRAM_MESSAGES } from './data/mrtData';
@@ -39,6 +40,7 @@ export default function App() {
   const [storeModalPlatform, setStoreModalPlatform] = useState<'apple' | 'google' | null>(null);
   const [isTelegramModalOpen, setIsTelegramModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+  const [isHealthModalOpen, setIsHealthModalOpen] = useState(false);
 
   const [isProUser, setIsProUser] = useState(false);
   const [telegramFeed, setTelegramFeed] = useState<TelegramMessage[]>(INITIAL_TELEGRAM_MESSAGES);
@@ -137,6 +139,7 @@ export default function App() {
         onSelectLine={(line) => setSelectedLineForModal(line)}
         onOpenTelegram={() => setIsTelegramModalOpen(true)}
         onOpenDownload={() => setStoreModalPlatform('apple')}
+        onOpenHealthMonitor={() => setIsHealthModalOpen(true)}
       />
 
       <main className="flex-1">
@@ -201,6 +204,7 @@ export default function App() {
         onOpenDigest={() => setIsDigestModalOpen(true)}
         onRequestApiAccess={() => setIsEnterpriseModalOpen(true)}
         onOpenFeedback={() => setIsFeedbackModalOpen(true)}
+        onOpenHealthMonitor={() => setIsHealthModalOpen(true)}
       />
 
       {/* Interactive Modals */}
@@ -265,6 +269,11 @@ export default function App() {
             'Thank you for contributing to Singapore commuter transit intelligence.'
           );
         }}
+      />
+
+      <HealthMonitorModal
+        isOpen={isHealthModalOpen}
+        onClose={() => setIsHealthModalOpen(false)}
       />
 
       {/* Toast Notification Layer */}

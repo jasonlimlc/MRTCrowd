@@ -8,6 +8,7 @@ interface FooterProps {
   onOpenDigest: () => void;
   onRequestApiAccess: () => void;
   onOpenFeedback: () => void;
+  onOpenHealthMonitor: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
@@ -17,6 +18,7 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenDigest,
   onRequestApiAccess,
   onOpenFeedback,
+  onOpenHealthMonitor,
 }) => {
   return (
     <footer
@@ -100,6 +102,15 @@ export const Footer: React.FC<FooterProps> = ({
                   className="hover:text-slate-200 transition text-left cursor-pointer"
                 >
                   Operator Analytics Portal
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={onOpenHealthMonitor}
+                  className="hover:text-emerald-400 transition text-left cursor-pointer flex items-center space-x-1"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>API Health Monitor (/api/health)</span>
                 </button>
               </li>
             </ul>

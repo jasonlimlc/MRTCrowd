@@ -7,6 +7,7 @@ interface HeaderProps {
   onSelectLine: (line: MRTLine) => void;
   onOpenTelegram: () => void;
   onOpenDownload: () => void;
+  onOpenHealthMonitor: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -14,6 +15,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectLine,
   onOpenTelegram,
   onOpenDownload,
+  onOpenHealthMonitor,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -26,10 +28,19 @@ export const Header: React.FC<HeaderProps> = ({
       >
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center space-x-2 text-slate-300">
-            <span className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 live-pulse"></span>
-            <span className="font-semibold tracking-wide text-slate-200 uppercase text-[11px]">
-              System Status: Normal Operations
-            </span>
+            <button
+              onClick={onOpenHealthMonitor}
+              className="flex items-center space-x-1.5 hover:text-white transition cursor-pointer group"
+              title="Click to monitor /api/health live in browser"
+            >
+              <span className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 live-pulse"></span>
+              <span className="font-semibold tracking-wide text-slate-200 uppercase text-[11px] group-hover:text-emerald-400 transition-colors">
+                System Status: Normal Operations
+              </span>
+              <span className="text-[9px] bg-slate-800 text-emerald-400 px-1.5 py-0.2 rounded border border-slate-700 font-mono-numbers">
+                API Health ↗
+              </span>
+            </button>
             <span className="text-slate-500 hidden sm:inline">|</span>
             <span className="text-slate-400 hidden sm:inline">
               Peak Hour Forecast Active

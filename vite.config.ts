@@ -30,6 +30,12 @@ function apiDevMiddleware(): Plugin {
             return enhancedRes;
           };
         }
+        if (!enhancedRes.send) {
+          enhancedRes.send = function (data: any) {
+            enhancedRes.end(data);
+            return enhancedRes;
+          };
+        }
 
         // Attach parsed query parameters to req
         const query: Record<string, string> = {};
