@@ -43,6 +43,7 @@ export default function App() {
   const [isProUser, setIsProUser] = useState(false);
   const [communityFeed, setCommunityFeed] = useState<TelegramMessage[]>(INITIAL_TELEGRAM_MESSAGES);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [liveStationOverrides, setLiveStationOverrides] = useState<Record<string, Partial<StationData>>>({});
 
   const addToast = (type: 'success' | 'alert' | 'info', title: string, description: string) => {
     const newToast: ToastMessage = {
@@ -61,50 +62,89 @@ export default function App() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  const currentStation = STATIONS_DATABASE[currentStationId] || STATIONS_DATABASE['jurong-east'];
+  const fetchLiveCrowd = async (stationId: string, showNotification: boolean = false) => {
+    const baseStation = STATIONS_DATABASE[stationId] || STATIONS_DATABASE['jurong-east'];
+    try {
+      const res = await fetch(`/api/crowd?station=${stationId}`);
+      if (res.ok) {
+        const data = await res.json();
+        const p = data.crowdPercentage || baseStation.crowdPercentage;
 
-  const handleSelectStation = (stationId: string) => {
-    setCurrentStationId(stationId);
-    const station = STATIONS_DATABASE[stationId];
-    if (station) {
-      addToast(
-        'info',
-        `Selected ${station.name}`,
-        `Platform density: ${station.crowdPercentage}%. Recommended departure: ${station.recommendedDeparture}.`
-      );
+        // Dynamically adjust car fullness to match live crowd percentage
+        const newCarFullness = baseStation.carFullness.map((car, idx) => {
+          const modifier = (idx === 2 || idx === 3) ? 10 : (idx === 0 || idx === 5) ? -10 : 0;
+          const carPercent = Math.min(98, Math.max(15, p + modifier));
+          const level: 'Low' | 'Moderate' | 'Packed' = carPercent > 75 ? 'Packed' : carPercent > 45 ? 'Moderate' : 'Low';
+          const seatsEstimate = level === 'Packed' ? 0 : level === 'Moderate' ? Math.max(2, Math.round((75 - carPercent) / 6)) : Math.round((95 - carPercent) / 4);
+          return {
+            ...car,
+            percentage: carPercent,
+            level,
+            seatsEstimate,
+          };
+        });
+
+        const updated: Partial<StationData> = {
+          crowdPercentage: p,
+          crowdLevel: data.crowdLevel || baseStation.crowdLevel,
+          source: data.source,
+          latencyMs: data.latencyMs,
+          isLive: true,
+          ltaConnected: data._diagnostic?.ltaConfigured === true,
+          lastUpdated: new Date().toLocaleTimeString('en-SG', {
+            timeZone: 'Asia/Singapore',
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          }),
+          carFullness: newCarFullness,
+        };
+
+        setLiveStationOverrides((prev) => ({
+          ...prev,
+          [stationId]: updated,
+        }));
+
+        if (showNotification) {
+          addToast(
+            'success',
+            `Live API Telemetry Verified (${data.stationCode || baseStation.code})`,
+            `Platform crowd: ${p}% (${data.crowdLevel || baseStation.crowdLevel}). Latency: ${data.latencyMs ? data.latencyMs + 'ms' : 'fast'}. ${data._diagnostic?.ltaConfigured ? 'Official LTA DataMall connected.' : 'Simulation mode (awaiting LTA key in Vercel).'}`
+          );
+        }
+      }
+    } catch (err: any) {
+      if (showNotification) {
+        addToast('alert', 'Telemetry Fetch Failed', `Could not reach /api/crowd: ${err.message}`);
+      }
     }
   };
 
-  const handleCheckLiveCrowd = async () => {
-    addToast(
-      'info',
-      `Checking Live Crowd for ${currentStation.name}...`,
-      `Querying LTA DataMall PCDRealTime endpoint (/api/crowd?station=${currentStationId}).`
-    );
+  // Poll live telemetry on mount and when station changes
+  React.useEffect(() => {
+    fetchLiveCrowd(currentStationId, false);
+    const interval = setInterval(() => {
+      fetchLiveCrowd(currentStationId, false);
+    }, 25000);
+    return () => clearInterval(interval);
+  }, [currentStationId]);
 
+  const baseStation = STATIONS_DATABASE[currentStationId] || STATIONS_DATABASE['jurong-east'];
+  const currentStation: StationData = {
+    ...baseStation,
+    ...(liveStationOverrides[currentStationId] || {}),
+  };
+
+  const handleSelectStation = (stationId: string) => {
+    setCurrentStationId(stationId);
+    fetchLiveCrowd(stationId, true);
+  };
+
+  const handleCheckLiveCrowd = async () => {
     const widget = document.getElementById('crowd-widget');
     widget?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    try {
-      const res = await fetch(`/api/crowd?station=${currentStationId}`);
-      if (res.ok) {
-        const data = await res.json();
-        addToast(
-          'success',
-          `Live MRT Crowd: ${data.crowdLevel || currentStation.crowdLevel}`,
-          `${currentStation.name}: ${data.crowdPercentage || currentStation.crowdPercentage}% density. Leave at ${currentStation.recommendedDeparture} to save ${currentStation.minutesSaved} mins.`
-        );
-        return;
-      }
-    } catch {
-      // Graceful fallback to verified telemetry
-    }
-
-    addToast(
-      'success',
-      `Live MRT Crowd: ${currentStation.crowdLevel}`,
-      `${currentStation.name}: ${currentStation.crowdPercentage}% load. Recommended departure at ${currentStation.recommendedDeparture}.`
-    );
+    await fetchLiveCrowd(currentStationId, true);
   };
 
   const handleTriggerAlarmSimulation = () => {

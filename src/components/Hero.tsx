@@ -179,6 +179,38 @@ export const Hero: React.FC<HeroProps> = ({
                 </div>
               </div>
 
+              {/* Live Telemetry Diagnostic Bar */}
+              <div className="flex items-center justify-between text-[10px] text-slate-400 mt-2.5 pt-2 border-t border-slate-800/80">
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      currentStation.ltaConnected ? 'bg-sky-400 animate-pulse' : 'bg-emerald-400 animate-pulse'
+                    }`}
+                  ></span>
+                  <span className="font-semibold text-slate-300">
+                    {currentStation.ltaConnected
+                      ? 'LTA Official PCDRealTime'
+                      : 'Live Telemetry Engine (/api/crowd)'}
+                  </span>
+                  {currentStation.latencyMs !== undefined && (
+                    <span className="font-mono-numbers text-slate-500">
+                      • {currentStation.latencyMs}ms
+                    </span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCheckCrowdAction}
+                  className="text-[10px] text-sky-400 hover:text-sky-300 font-medium flex items-center gap-1 cursor-pointer transition"
+                  title="Click to force fetch live crowd from /api/crowd"
+                >
+                  <RefreshCw className={`w-2.5 h-2.5 ${isScanning ? 'animate-spin' : ''}`} />
+                  <span>
+                    {currentStation.lastUpdated ? `Live: ${currentStation.lastUpdated}` : 'Ping API'}
+                  </span>
+                </button>
+              </div>
+
               {/* Best Leave Time AI Recommendation */}
               <div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-sky-950/70 via-slate-900 to-slate-900 border border-sky-800/40 relative overflow-hidden">
                 <div className="flex items-center justify-between">

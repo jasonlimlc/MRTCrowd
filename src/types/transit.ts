@@ -41,6 +41,11 @@ export interface StationData {
     timeAgo: string;
     upvotes: number;
   };
+  source?: string;
+  lastUpdated?: string;
+  latencyMs?: number;
+  isLive?: boolean;
+  ltaConnected?: boolean;
 }
 
 export interface TelegramMessage {
