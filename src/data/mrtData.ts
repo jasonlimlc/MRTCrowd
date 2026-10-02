@@ -347,8 +347,8 @@ export const STATIONS_DATABASE: Record<string, StationData> = {
 
 export const INITIAL_TELEGRAM_MESSAGES: TelegramMessage[] = [
   {
-    id: 'tg-1',
-    sender: 'CommuteWise Bot',
+    id: 'msg-1',
+    sender: 'CommuteWise Alert System',
     senderType: 'bot',
     time: '07:45 AM',
     title: '🌅 Morning Commute Alert: NSL toward Raffles Place',
@@ -357,7 +357,7 @@ export const INITIAL_TELEGRAM_MESSAGES: TelegramMessage[] = [
     savedMins: 11,
   },
   {
-    id: 'tg-2',
+    id: 'msg-2',
     sender: 'Rider Verification (Orchard TE14)',
     senderType: 'user',
     time: '18:02 PM',
@@ -365,8 +365,8 @@ export const INITIAL_TELEGRAM_MESSAGES: TelegramMessage[] = [
     verifiedBy: 42,
   },
   {
-    id: 'tg-3',
-    sender: 'CommuteWise Bot',
+    id: 'msg-3',
+    sender: 'CommuteWise Alert System',
     senderType: 'bot',
     time: '18:11 PM',
     title: '⚡ Circle Line Quick Advisory: Serangoon Interchange',

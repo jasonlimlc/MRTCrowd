@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
-import { Check, MessageSquare, ThumbsUp, Send, ShieldCheck, Sparkles } from 'lucide-react';
+import { Check, MessageSquare, ThumbsUp, Send, ShieldCheck, Sparkles, Radio } from 'lucide-react';
 import { TelegramMessage } from '../types/transit';
 
 interface CommunitySectionProps {
   messages: TelegramMessage[];
   onAddMessage: (msg: TelegramMessage) => void;
-  onOpenTelegramModal: () => void;
   onOpenDigest: () => void;
 }
 
 export const CommunitySection: React.FC<CommunitySectionProps> = ({
   messages,
   onAddMessage,
-  onOpenTelegramModal,
   onOpenDigest,
 }) => {
   const [stationInput, setStationInput] = useState('Orchard NS22');
@@ -57,7 +55,7 @@ export const CommunitySection: React.FC<CommunitySectionProps> = ({
   return (
     <section
       className="py-16 sm:py-20 bg-[#080D1A] border-t border-slate-800"
-      data-purpose="community-telegram-section"
+      data-purpose="community-feed-section"
       id="community"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,8 +72,8 @@ export const CommunitySection: React.FC<CommunitySectionProps> = ({
 
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
               By combining LTA's official sensors with real-time feedback from our 42,000+ daily
-              Telegram & in-app commuters, we keep customer acquisition lean and support costs down
-              while giving riders an interactive voice.
+              in-app commuters, we keep data hyper-accurate and support costs down while giving riders
+              an interactive voice on platform conditions.
             </p>
 
             <div className="space-y-4 pt-2">
@@ -94,13 +92,15 @@ export const CommunitySection: React.FC<CommunitySectionProps> = ({
 
               <div className="flex items-start space-x-3.5">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                  <MessageSquare className="w-4 h-4" />
+                  <Radio className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-white font-semibold text-sm">Telegram Alert Community Bot</h4>
+                  <h4 className="text-white font-semibold text-sm">
+                    Instant Rush Hour Platform Flash Alerts
+                  </h4>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Automated flash alerts for track faults, rain surge congestion, and station crowd
-                    bottlenecks right inside your chat feed.
+                    Automated live alerts for track faults, rain surge congestion, and station crowd
+                    bottlenecks right on your mobile screen and browser.
                   </p>
                 </div>
               </div>
@@ -130,28 +130,23 @@ export const CommunitySection: React.FC<CommunitySectionProps> = ({
             </div>
           </div>
 
-          {/* Right: Telegram Bot & Verification Feed Preview Mockup */}
+          {/* Right: Real-Time Rider Verification Feed */}
           <div className="lg:col-span-6">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl space-y-4">
-              {/* Telegram Feed Header */}
+              {/* Feed Header */}
               <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-8 h-8 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.77-1.18 3.35-1.39 3.73-1.39.08 0 .27.02.39.12.1.08.13.19.14.28-.01.07-.01.16-.02.26z" />
-                    </svg>
+                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                    <Radio className="w-4 h-4 animate-pulse" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">SGRider Pulse Telegram Community</h4>
-                    <p className="text-[11px] text-emerald-400">● 14,820 commuters online now</p>
+                    <h4 className="text-sm font-bold text-white">SGRider Live Commuter Feed</h4>
+                    <p className="text-[11px] text-emerald-400">● 14,820 commuters active in Singapore</p>
                   </div>
                 </div>
-                <button
-                  onClick={onOpenTelegramModal}
-                  className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700 transition cursor-pointer"
-                >
-                  Join Free
-                </button>
+                <span className="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700">
+                  Live Verification
+                </span>
               </div>
 
               {/* Feed Messages */}
@@ -171,7 +166,7 @@ export const CommunitySection: React.FC<CommunitySectionProps> = ({
                             msg.senderType === 'bot' ? 'text-sky-400' : 'text-amber-400'
                           }`}
                         >
-                          {msg.senderType === 'bot' ? '🤖' : '👤'} {msg.sender}
+                          {msg.senderType === 'bot' ? '⚡' : '👤'} {msg.sender}
                         </span>
                         <span className="font-mono-numbers">{msg.time}</span>
                       </div>

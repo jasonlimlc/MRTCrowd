@@ -121,7 +121,7 @@ export const Pillars: React.FC<PillarsProps> = ({
                 Commuter Verification
               </h3>
               <p className="text-sm text-slate-400 leading-relaxed">
-                Riders confirm or correct crowd reports directly on Telegram & the app, keeping data
+                Riders confirm or correct crowd reports directly in the app, keeping data
                 hyper-accurate while minimizing overhead.
               </p>
             </div>

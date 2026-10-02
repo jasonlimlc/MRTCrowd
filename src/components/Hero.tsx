@@ -8,6 +8,7 @@ interface HeroProps {
   onSelectStation: (stationId: string) => void;
   onOpenStationDetail: (station: StationData) => void;
   onTriggerAlarmSimulation: () => void;
+  onCheckLiveCrowd?: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
@@ -16,11 +17,13 @@ export const Hero: React.FC<HeroProps> = ({
   onSelectStation,
   onOpenStationDetail,
   onTriggerAlarmSimulation,
+  onCheckLiveCrowd,
 }) => {
   const [selectedCar, setSelectedCar] = useState<number | null>(null);
   const [upvotes, setUpvotes] = useState(currentStation.recentReport.upvotes);
   const [hasUpvoted, setHasUpvoted] = useState(false);
   const [sgtTime, setSgtTime] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
 
   // Update real-time Singapore Time
   useEffect(() => {
@@ -56,6 +59,24 @@ export const Hero: React.FC<HeroProps> = ({
     }
   };
 
+  const handleCheckCrowdAction = () => {
+    setIsScanning(true);
+    const widgetEl = document.getElementById('crowd-widget');
+    if (widgetEl) {
+      widgetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    const selectEl = document.getElementById('station-select') as HTMLSelectElement | null;
+    selectEl?.focus();
+
+    if (onCheckLiveCrowd) {
+      onCheckLiveCrowd();
+    }
+
+    setTimeout(() => {
+      setIsScanning(false);
+    }, 1500);
+  };
+
   return (
     <section
       className="relative pt-10 sm:pt-14 pb-20 overflow-hidden bg-gradient-to-b from-[#080D1A] via-[#0D1527] to-[#080D1A]"
@@ -82,12 +103,14 @@ export const Hero: React.FC<HeroProps> = ({
 
             {/* Core Action / Touchpoint Notification Snapshot */}
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <a
-                href="#crowd-widget"
-                className="inline-flex justify-center items-center px-6 py-3.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-sm shadow-xl shadow-sky-500/20 transition cursor-pointer"
+              <button
+                type="button"
+                onClick={handleCheckCrowdAction}
+                className="inline-flex justify-center items-center px-6 py-3.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-sm shadow-xl shadow-sky-500/20 transition cursor-pointer active:scale-95 group"
               >
-                Check Live Station Crowd
-              </a>
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-950 mr-2 animate-pulse"></span>
+                <span>{isScanning ? 'Querying LTA Real-Time...' : 'Check Live Station Crowd'}</span>
+              </button>
               <a
                 href="#how-it-works"
                 className="inline-flex justify-center items-center px-6 py-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-200 font-semibold text-sm transition cursor-pointer"
@@ -115,7 +138,17 @@ export const Hero: React.FC<HeroProps> = ({
 
           {/* Right Column: Interactive Live Crowd Preview Widget */}
           <div className="lg:col-span-5" data-purpose="live-mrt-preview-widget" id="crowd-widget">
-            <div className="relative bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl transition-all duration-300">
+            <div
+              className={`relative bg-slate-900/90 border rounded-2xl p-5 sm:p-6 shadow-2xl backdrop-blur-xl transition-all duration-300 ${
+                isScanning
+                  ? 'border-sky-400 ring-2 ring-sky-400 shadow-sky-500/30 scale-[1.01]'
+                  : 'border-slate-800'
+              }`}
+            >
+              {/* Scan Bar Indicator */}
+              {isScanning && (
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-400 via-emerald-400 to-sky-400 rounded-t-2xl animate-pulse"></div>
+              )}
               {/* Widget Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-800">
                 <div className="flex items-center space-x-2">

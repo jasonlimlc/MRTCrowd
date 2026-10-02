@@ -4,21 +4,21 @@ import { MRTLine } from '../types/transit';
 interface FooterProps {
   lines: MRTLine[];
   onSelectLine: (line: MRTLine) => void;
-  onOpenTelegram: () => void;
   onOpenDigest: () => void;
   onRequestApiAccess: () => void;
   onOpenFeedback: () => void;
   onOpenHealthMonitor: () => void;
+  onCheckLiveCrowd?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   lines,
   onSelectLine,
-  onOpenTelegram,
   onOpenDigest,
   onRequestApiAccess,
   onOpenFeedback,
   onOpenHealthMonitor,
+  onCheckLiveCrowd,
 }) => {
   return (
     <footer
@@ -76,12 +76,12 @@ export const Footer: React.FC<FooterProps> = ({
             </h4>
             <ul className="space-y-1.5 text-[11px]">
               <li>
-                <button
-                  onClick={onOpenTelegram}
+                <a
+                  href="#community"
                   className="hover:text-slate-200 transition text-left cursor-pointer"
                 >
-                  SGRider Pulse Telegram
-                </button>
+                  Live MRT Commuter Feed
+                </a>
               </li>
               <li>
                 <a href="#how-it-works" className="hover:text-slate-200 transition">

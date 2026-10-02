@@ -89,7 +89,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
                 </li>
                 <li className="flex items-center space-x-2.5">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Telegram Bot alert access</span>
+                  <span>Instant rush hour push & departure alerts</span>
                 </li>
                 <li className="flex items-center space-x-2.5 text-slate-400">
                   <X className="w-4 h-4 text-slate-600 shrink-0" />
